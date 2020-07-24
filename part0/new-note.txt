@@ -1,0 +1,33 @@
+title New note
+
+note over Browser:
+User writes new note
+and submits form
+end note
+
+Browser->Server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note note
+
+note over Server:
+Server saves received note in-memory
+with timestamp and redirects back to same page
+end note
+
+Server-->Browser: 302 Found Location: /notes
+Browser->Server: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+Server-->Browser: HTML-code
+Browser->Server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+Server-->Browser: main.css
+Browser->Server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+Server-->Browser: main.js
+
+note over Browser:
+main.js is executed and
+data.json is fetched via XHR
+end note
+
+Browser->Server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+Server-->Browser: Array list of note objects
+
+note over Browser:
+The notes are rendered on the page
+end note

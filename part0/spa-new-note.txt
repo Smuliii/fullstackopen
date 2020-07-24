@@ -1,0 +1,19 @@
+title SPA - New note
+
+note over Browser:
+User writes new note
+and submits form via XHR
+end note
+
+note over Browser:
+The notes are updated on the page immediately
+end note
+
+Browser->Server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa \n JSON { content, date }
+
+note over Server:
+Server saves received note with timestamp in-memory
+and returns response message
+end note
+
+Server-->Browser: JSON { message: "note created" }
