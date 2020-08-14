@@ -16,8 +16,11 @@ const App = () => {
     fetchPersons()
   }, [])
 
+
+  const handleDbError = error => flashNotification(error.response?.data?.error, true)
+
   const fetchPersons = () => {
-    PersonService.get().then(data => setPersons(data))
+    PersonService.get().then(data => setPersons(data)).catch(handleDbError)
   }
 
   const addPerson = e => {
@@ -33,7 +36,7 @@ const App = () => {
           setNewName('')
           setNewNumber('')
           flashNotification(`Number was updated: ${existingPerson.number} -> ${data.number}`)
-        })
+        }).catch(handleDbError)
       }
       return
     }
@@ -45,7 +48,7 @@ const App = () => {
       // Refresh search
       setSearch(search)
       flashNotification(`New person added: ${data.name}`)
-    })
+    }).catch(handleDbError)
   }
 
   const flashNotification = (message, error = false) => {
@@ -66,7 +69,7 @@ const App = () => {
   }
 
   const handleRemove = e => {
-    const id = Number(e.target.dataset.person)
+    const id = e.target.dataset.person
     const person = persons.find(person => person.id === id)
     const updatePersonsList = () => setPersons(persons.filter(person => person.id !== id))
 
@@ -78,9 +81,7 @@ const App = () => {
     if (window.confirm(`Remove person ${person.name}?`)) {
       PersonService.remove(id).then(() => {
         flashNotification(`Person removed: ${person.name}`)
-      }).catch(() => {
-        flashNotification(`Person has already been remove from the server: ${person.name}`, true)
-      }).finally(() => updatePersonsList())
+      }).catch(handleDbError).finally(() => updatePersonsList())
     }
   }
 
