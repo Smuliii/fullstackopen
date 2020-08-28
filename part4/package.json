@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "jest --verbose"
   },
   "author": "Samuli Saarinen",
   "license": "ISC",
@@ -16,5 +16,12 @@
     "express": "^4.17.1",
     "mongoose": "^5.10.0",
     "nodemon": "^2.0.4"
+  },
+  "devDependencies": {
+    "jest": "^26.4.2",
+    "lodash": "^4.17.20"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
