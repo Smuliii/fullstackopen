@@ -2,6 +2,7 @@ const supertest = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/blog');
 
 const api = supertest(app);
 
@@ -138,5 +139,10 @@ test('should update blog item succesfully', async () => {
 
 	expect(response.body.likes).toBe(data.likes);
 });
+
+test('should ', async () => {
+
+})
+
 
 afterAll(() => mongoose.connection.close());
