@@ -6,7 +6,11 @@ const blogRouter = require('./controllers/blogs');
 
 const app = express();
 
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(config.MONGODB_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useFindAndModify: true,
+});
 
 app.use(cors());
 app.use(express.json());
