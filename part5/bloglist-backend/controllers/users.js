@@ -23,8 +23,9 @@ router.post('/', async (request, response) => {
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
   const user = new User({
-    username, name,
-    passwordHash,
+    username,
+    password: passwordHash,
+    name,
   })
 
   const savedUser = await user.save()
