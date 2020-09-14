@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import LoginForm from './components/LoginForm';
 import UserProfile from './components/UserProfile';
 import blogService from './services/blogs';
@@ -9,8 +9,8 @@ const App = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [user, setUser] = useState(null);
-	const [blogForm, setBlogForm] = useState({});
 	const [notification, setNotification] = useState(null);
+	const blogFormRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then(blogs => setBlogs(blogs));
@@ -58,33 +58,62 @@ const App = () => {
 		window.localStorage.removeItem('user');
 	};
 
-	const handleBlogFormSubmit = async e => {
-		e.preventDefault();
-
+	const createNewBlog = async blogData => {
 		try {
 			const blog = await blogService.addNew({
-				data: { ...blogForm },
+				data: { ...blogData },
 				token: user.token,
 			});
 			setBlogs(blogs.concat(blog));
 			flashNotification(`A new blog '${blog.title}' by ${blog.author} was added!`)
+			blogFormRef.current.toggleVisibility();
+			return true;
 		} catch (e) {
-			console.log(e.message)
+			flashNotification(e.message, true);
+			return false;
 		}
 	};
 
-	const handleBlogFormChange = e => {
-		setBlogForm({
-			...blogForm,
-			[e.target.name]: e.target.value,
-		})
+	const handleBlogLike = async id => {
+		const blog = blogs.find(blog => blog.id === id);
+		if (blog) {
+			const data = {
+				...blog,
+				likes: blog.likes + 1,
+				user: blog.user.id,
+			};
+			delete data.id;
+
+			try {
+				const update = await blogService.update({ id, data, token: user.token });
+				setBlogs(blogs.map(blog => ({
+					...blog,
+					likes: blog.id === update.id ? update.likes : blog.likes,
+				})));
+			} catch (e) {
+				flashNotification(e.message, true);
+			}
+		}
+	};
+
+	const handleBlogDelete = async id => {
+		if (window.confirm('Are you sure..?')) {
+			try {
+				await blogService.remove({ id, token: user.token, });
+				setBlogs(blogs.filter(blog => blog.id !== id));
+			} catch (e) {
+				flashNotification(e.message, true);
+			}
+		}
 	};
 
 	return (
 		<div>
 			{user
-			? <UserProfile blogs={getUsersBlogs()} user={user} blogForm={blogForm} notification={notification} handleLogOut={handleLogOut} handleBlogFormSubmit={handleBlogFormSubmit} handleBlogFormChange={handleBlogFormChange} />
-			: <LoginForm username={username} password={password} notification={notification} handleUsernameChange={handleUsernameChange} handlePasswordChange={handlePasswordChange} handleLogin={handleLogin} />}
+			? <UserProfile blogs={getUsersBlogs()} user={user} notification={notification}
+				handleLogOut={handleLogOut} handleBlogLike={handleBlogLike} handleBlogDelete={handleBlogDelete} createNewBlog={createNewBlog} ref={blogFormRef} />
+			: <LoginForm username={username} password={password} notification={notification}
+				handleUsernameChange={handleUsernameChange} handlePasswordChange={handlePasswordChange} handleLogin={handleLogin} />}
 		</div>
 	)
 };
