@@ -9,11 +9,12 @@ const Blog = ({ blog, handleBlogLike, handleBlogDelete }) => {
   }
 
   return (
-    <div style={style}>
-      {blog.title}
+    <div className="blog" style={style}>
+      <div className="blog-title">{blog.title}</div>
+	  <div className="blog-author">{blog.author}</div>
       <Togglable buttonLabel="Show">
-				Likes {blog.likes} <button onClick={() => handleBlogLike(blog.id)}>Like</button><br/>
-        <button onClick={() => handleBlogDelete(blog.id)}>Delete</button><br/>
+        <div className="blog-likes">Likes {blog.likes} <button className="blog-like" onClick={() => handleBlogLike(blog.id)}>Like</button><br/></div>
+        <button className="blog-delete" onClick={() => handleBlogDelete(blog.id)}>Delete</button><br/>
       </Togglable>
     </div>
   )
