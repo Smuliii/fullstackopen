@@ -3,7 +3,7 @@ import Notification from './Notification'
 
 const LoginForm = ({ username, password, notification, handleLogin, handleUsernameChange, handlePasswordChange }) => {
   return (
-    <form method="post" onSubmit={handleLogin}>
+    <form className="login-form" method="post" onSubmit={handleLogin}>
       <h2>Login</h2>
       <Notification notification={notification} />
       <div>

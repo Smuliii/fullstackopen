@@ -7,5 +7,7 @@ node_modules/
 # secrets
 .env
 
-# misc
+# tests
 coverage/
+**/cypress/screenshots/
+**/cypress/videos/

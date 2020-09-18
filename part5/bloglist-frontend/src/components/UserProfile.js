@@ -7,7 +7,7 @@ import Togglable from './Togglable'
 
 const UserProfile = React.forwardRef(({ blogs, user, notification, handleLogOut, handleBlogLike, handleBlogDelete, createNewBlog }, ref) => {
   return (
-    <div>
+    <div className="user-profile">
       <h2>Hello, {user.name}</h2>
       <Notification notification={notification} />
       <button onClick={handleLogOut}>Logout</button>
@@ -15,7 +15,7 @@ const UserProfile = React.forwardRef(({ blogs, user, notification, handleLogOut,
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
       <h3>Blogs</h3>
-      <div>
+      <div className="blog-list">
         {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
           <Blog key={blog.id} blog={blog} handleBlogLike={handleBlogLike} handleBlogDelete={handleBlogDelete} />
         ))}

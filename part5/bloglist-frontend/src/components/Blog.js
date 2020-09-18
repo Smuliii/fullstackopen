@@ -13,7 +13,7 @@ const Blog = ({ blog, handleBlogLike, handleBlogDelete }) => {
       <div className="blog-title">{blog.title}</div>
 	  <div className="blog-author">{blog.author}</div>
       <Togglable buttonLabel="Show">
-        <div className="blog-likes">Likes {blog.likes} <button className="blog-like" onClick={() => handleBlogLike(blog.id)}>Like</button><br/></div>
+        <div className="blog-likes">Likes <span className="blog-like-count">{blog.likes}</span> <button className="blog-like" onClick={() => handleBlogLike(blog.id)}>Like</button><br/></div>
         <button className="blog-delete" onClick={() => handleBlogDelete(blog.id)}>Delete</button><br/>
       </Togglable>
     </div>

@@ -1,0 +1,20 @@
+[
+	{
+		"title": "Test blog post",
+		"author": "John doe",
+		"url": "www.google.fi",
+		"likes": 0
+	},
+	{
+		"title": "Test blog post",
+		"author": "John doe",
+		"url": "www.google.fi",
+		"likes": 5
+	},
+	{
+		"title": "Test blog post",
+		"author": "John doe",
+		"url": "www.google.fi",
+		"likes": 2
+	}
+]
