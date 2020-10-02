@@ -32,7 +32,10 @@ describe('anecdote reducer', () => {
   })
 
   test('should add new anecdote to the list', () => {
-    const action = addAnecdote('New anecdote')
+    const action = addAnecdote({
+      content: 'New anecdote',
+      id: '4',
+    })
     const state = deepFreeze(initialState)
     const newState = anecdoteReducer(state, action)
     expect(newState).toEqual(expect.arrayContaining([{

@@ -20,15 +20,23 @@ const setNotification = message => {
   }
 }
 
-const clearNotification = message => {
+const clearNotification = () => {
   return {
     type: 'CLEAR_NOTIFICATION',
+  }
+}
+
+const flashNotification = (message, timeout = 5000) => {
+  return dispatch => {
+    dispatch(setNotification(message))
+    setTimeout(() => dispatch(clearNotification()), timeout)
   }
 }
 
 export default notificationReducer
 export {
   setNotification,
-  clearNotification
+  clearNotification,
+  flashNotification
 }
 
