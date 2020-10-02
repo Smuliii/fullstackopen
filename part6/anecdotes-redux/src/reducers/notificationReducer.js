@@ -1,4 +1,5 @@
 const initialState = null
+let notificationTimer = null
 
 const notificationReducer = (state = initialState, { type, payload }) => {
   switch (type) {
@@ -29,7 +30,8 @@ const clearNotification = () => {
 const flashNotification = (message, timeout = 5000) => {
   return dispatch => {
     dispatch(setNotification(message))
-    setTimeout(() => dispatch(clearNotification()), timeout)
+    clearTimeout(notificationTimer)
+    notificationTimer = setTimeout(() => dispatch(clearNotification()), timeout)
   }
 }
 
