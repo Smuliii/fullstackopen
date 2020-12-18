@@ -3,10 +3,8 @@ import calculateBmi from './bmiCalculator';
 import calculateExercises from './exerciseCalculator';
 
 interface ExercisesRequest {
-	body: {
-		target: number,
-		daily_exercises: number[],
-	}
+	target: number,
+	daily_exercises: number[],
 }
 
 const app = express();
@@ -28,8 +26,8 @@ app.get('/bmi', (req, res) => {
 	}
 });
 
-app.post('/exercises', (req: ExercisesRequest, res) => {
-	const { target, daily_exercises: exercises } = req.body;
+app.post('/exercises', (req, res) => {
+	const { target, daily_exercises: exercises } = req.body as ExercisesRequest;
 
 	if (!target || !Array.isArray(exercises) || exercises.length < 2 || (exercises).find((value: string | number) => Number.isNaN(Number(value)))) {
 		res.status(400).json({ error: 'invalid parameters' });
