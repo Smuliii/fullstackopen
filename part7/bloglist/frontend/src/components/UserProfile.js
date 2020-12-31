@@ -5,11 +5,11 @@ import BlogForm from './BlogForm'
 import Notification from './Notification'
 import Togglable from './Togglable'
 
-const UserProfile = React.forwardRef(({ blogs, user, notification, handleLogOut, handleBlogLike, handleBlogDelete, createNewBlog }, ref) => {
+const UserProfile = React.forwardRef(({ blogs, user, handleLogOut, handleBlogLike, handleBlogDelete, createNewBlog }, ref) => {
   return (
     <div className="user-profile">
       <h2>Hello, {user.name}</h2>
-      <Notification notification={notification} />
+      <Notification />
       <button onClick={handleLogOut}>Logout</button>
       <Togglable labelShow="Add new blog" labelHide="Cancel" ref={ref}>
         <BlogForm createNewBlog={createNewBlog} />

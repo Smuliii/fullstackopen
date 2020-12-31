@@ -1,29 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
 import LoginForm from './components/LoginForm';
 import UserProfile from './components/UserProfile';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import { setBlogs, addBlog, likeBlog,  deleteBlog } from "./store/blogs";
+import { setNotification, removeNotification } from "./store/notification";
+import { setUserData, clearUserData } from "./store/user";
 
 const App = () => {
-	const [blogs, setBlogs] = useState([]);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
-	const [user, setUser] = useState(null);
-	const [notification, setNotification] = useState(null);
 	const blogFormRef = useRef();
+	const dispatch = useDispatch();
+	const blogs = useSelector(state => state.blogs);
+	const user = useSelector(state => state.user);
 
 	useEffect(() => {
-		blogService.getAll().then(blogs => setBlogs(blogs));
+		blogService.getAll().then(blogs => dispatch(setBlogs(blogs)));
 
 		const loggedInUser = window.localStorage.getItem('user');
 		if (loggedInUser) {
-			setUser(JSON.parse(loggedInUser));
+			dispatch(setUserData(JSON.parse(loggedInUser)));
 		}
 	}, []);
 
 	const flashNotification = (message, error = false) => {
-	  setNotification({ message, error })
-	  setTimeout(() => setNotification(null), 3000)
+		dispatch(setNotification({ message, error }))
+		setTimeout(() => dispatch(removeNotification(null)), 3000)
 	}
 
 	const getUsersBlogs = () => {
@@ -43,7 +47,7 @@ const App = () => {
 		try {
 			const user = await loginService.login({ username, password });
 
-			setUser(user);
+			dispatch(setUserData(user));
 			setUsername('');
 			setPassword('');
 
@@ -54,7 +58,7 @@ const App = () => {
 	};
 
 	const handleLogOut = () => {
-		setUser(null);
+		dispatch(clearUserData());
 		window.localStorage.removeItem('user');
 	};
 
@@ -64,7 +68,7 @@ const App = () => {
 				data: { ...blogData },
 				token: user.token,
 			});
-			setBlogs(blogs.concat(blog));
+			dispatch(addBlog(blog));
 			flashNotification(`A new blog '${blog.title}' by ${blog.author} was added!`)
 			blogFormRef.current.toggleVisibility();
 			return true;
@@ -86,10 +90,7 @@ const App = () => {
 
 			try {
 				const update = await blogService.update({ id, data, token: user.token });
-				setBlogs(blogs.map(blog => ({
-					...blog,
-					likes: blog.id === update.id ? update.likes : blog.likes,
-				})));
+				dispatch(likeBlog({ id: update.id, likes: update.likes }));
 			} catch (e) {
 				flashNotification(e.message, true);
 			}
@@ -100,7 +101,7 @@ const App = () => {
 		if (window.confirm('Are you sure..?')) {
 			try {
 				await blogService.remove({ id, token: user.token, });
-				setBlogs(blogs.filter(blog => blog.id !== id));
+				dispatch(deleteBlog(id));
 			} catch (e) {
 				flashNotification(e.message, true);
 			}
@@ -110,9 +111,9 @@ const App = () => {
 	return (
 		<div>
 			{user
-			? <UserProfile blogs={getUsersBlogs()} user={user} notification={notification}
+			? <UserProfile blogs={getUsersBlogs()} user={user}
 				handleLogOut={handleLogOut} handleBlogLike={handleBlogLike} handleBlogDelete={handleBlogDelete} createNewBlog={createNewBlog} ref={blogFormRef} />
-			: <LoginForm username={username} password={password} notification={notification}
+			: <LoginForm username={username} password={password}
 				handleUsernameChange={handleUsernameChange} handlePasswordChange={handlePasswordChange} handleLogin={handleLogin} />}
 		</div>
 	)
