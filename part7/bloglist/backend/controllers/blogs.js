@@ -2,10 +2,12 @@ const router = require('express').Router()
 const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 
 router.get('/', async (request, response) => {
   const blogs = await Blog
     .find({}).populate('user', { username: 1, name: 1 })
+    .find({}).populate('comments', { content: 1 })
 
   response.json(blogs)
 })
@@ -48,7 +50,7 @@ router.post('/', async (request, response) => {
   const user = await User.findById(decodedToken.id)
 
   if (!blog.url || !blog.title) {
-    return response.status(400).send({ error: 'title or url missing ' })
+    return response.status(400).send({ error: 'title or url missing' })
   }
 
   if (!blog.likes) {
@@ -62,6 +64,31 @@ router.post('/', async (request, response) => {
   await user.save()
 
   response.status(201).json(savedBlog)
+})
+
+router.post('/:id/comments', async (request, response) => {
+  const { id } = request.params
+  const { content } = request.body
+  let blog
+
+  try {
+    blog = id && await Blog.findById(id)
+  } catch (e) {
+    return response.status(400).json({ error: 'invalid blog id' })
+  }
+
+  if (!content) {
+    return response.status(400).json({ error: 'invalid data' })
+  }
+
+  const comment = new Comment({ content })
+  const savedComment = await comment.save()
+  blog.comments = blog.comments.concat(savedComment._id)
+  await blog.save()
+
+  const blogWithComments = await Blog.findById(id).populate('comments', { content: 1 })
+
+  response.json(blogWithComments)
 })
 
 module.exports = router
