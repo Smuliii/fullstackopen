@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDiagnoses = void 0;
-const diagnoses_json_1 = __importDefault(require("../../data/diagnoses.json"));
+const diagnoses_json_1 = __importDefault(require("../data/diagnoses.json"));
 const diagnoses = diagnoses_json_1.default;
 const getDiagnoses = () => {
     return diagnoses;

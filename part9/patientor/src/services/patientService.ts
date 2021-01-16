@@ -1,25 +1,8 @@
-import patientsData from "../../data/patients.json";
-import { isDate, isString } from "../utils";
+import patientsData from '../data/patients';
+import { assertNever, generateId, isDate, isNumber, isObject, isString, validateData, Validations } from '../utils';
+import { Patient, Gender, PublicPatient, NewPatient, Entry, NewEntry, NewEntryData, HealthCheckRating, } from '../types';
 
-export enum Gender {
-	Male = 'male',
-	Female = 'female',
-	Other = 'other',
-}
-
-export interface Patient {
-	id: string;
-	name: string;
-	dateOfBirth: string;
-	ssn: string;
-	gender: Gender;
-	occupation: string;
-}
-
-export type NonSensitivePatientData = Omit<Patient, 'ssn'>;
-export type NewPatient = Omit<Patient, 'id'>;
-
-const patients = patientsData as Patient[];
+const patients = patientsData;
 
 const isGender = (gender: string): gender is Gender => {
 	return Object.values(Gender).includes(gender as Gender);
@@ -29,19 +12,24 @@ export const getPatients = (): Patient[] => {
 	return patients;
 };
 
-export const getNonSensitivePatientData = (): NonSensitivePatientData[] => {
+export const getPatient = (id: string): Patient | false => {
+	return patients.find(patient => patient.id === id) || false;
+};
+
+export const getNonSensitivePatientData = (): PublicPatient[] => {
 	return patients.map(patient => ({
 		id: patient.id,
 		name: patient.name,
 		dateOfBirth: patient.dateOfBirth,
 		gender: patient.gender,
 		occupation: patient.occupation,
+		entries: [],
 	}));
 };
 
 export const addPatient = (data: NewPatient): Patient => {
 	const newPatient = {
-		id: String(Math.floor(Math.random() * 100000)),
+		id: generateId(),
 		...data
 	};
 
@@ -50,11 +38,18 @@ export const addPatient = (data: NewPatient): Patient => {
 	return newPatient;
 };
 
-export const parseNewPatientData = (data: Partial<NewPatient>): NewPatient => {
-	if (typeof data !== 'object' || !data) {
-		throw new Error("Invalid data");
-	}
+export const addEntry = (id: string, data: NewEntry): Entry => {
+	const patient = getPatient(id) as Patient;
+	const newEntry = {
+		id: generateId(),
+		...data,
+	} as Entry;
+	patient.entries.push(newEntry);
 
+	return newEntry;
+};
+
+export const parseNewPatientData = (data: Partial<NewPatient>): NewPatient => {
 	const validations = {
 		name: (name: unknown) => isString(name),
 		dateOfBirth: (dateOfBirth: unknown) => isString(dateOfBirth) && isDate(dateOfBirth) ,
@@ -63,12 +58,51 @@ export const parseNewPatientData = (data: Partial<NewPatient>): NewPatient => {
 		occupation: (occupation: unknown) => isString(occupation),
 	};
 
-	Object.entries(validations).forEach(([key, test]) => {
-		const value = data[key as keyof Partial<NewPatient>] as unknown;
-		if (typeof value === 'undefined' || !test(value)) {
-			throw new Error(`Invalid value for: ${key}`);
-		}
-	});
+	validateData(data, validations);
 
 	return data as NewPatient;
+};
+
+export const parseNewEntryData = (id: string, data: NewEntryData): NewEntry => {
+	const baseValidations = {
+		description: (description: unknown) => isString(description),
+		date: (date: unknown) => isString(date) && isDate(date),
+		specialist: (specialist: unknown) => isString(specialist),
+	};
+
+	const typeValidations = {
+		'HealthCheck': {
+			healthCheckRating: (healthCheckRating: unknown) => isNumber(healthCheckRating) && healthCheckRating in HealthCheckRating,
+		},
+		'Hospital': {
+			discharge: (discharge: unknown) => isObject(discharge) && isString(discharge.date) && isDate(discharge.date) && isString(discharge.criteria),
+		},
+		'OccupationalHealthcare': {
+			employerName: (employerName: unknown) => isString(employerName),
+		},
+	};
+
+	const patient = getPatient(id);
+
+	if (!patient) {
+		throw new Error('Invalid patient id');
+	}
+
+	let validations: Validations = {};
+
+	if (isObject(data)) {
+		switch (data.type) {
+			case 'HealthCheck':
+			case 'Hospital':
+			case 'OccupationalHealthcare':
+				validations = { ...baseValidations, ...typeValidations[data.type] };
+				break;
+			default:
+				assertNever(data);
+		}
+	}
+
+	validateData(data, validations);
+
+	return data as NewEntry;
 };

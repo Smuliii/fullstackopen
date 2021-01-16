@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseNewPatientData = exports.addPatient = exports.getNonSensitivePatientData = exports.getPatients = exports.Gender = void 0;
-const patients_json_1 = __importDefault(require("../../data/patients.json"));
+const patients_json_1 = __importDefault(require("../data/patients.json"));
 const utils_1 = require("../utils");
 var Gender;
 (function (Gender) {
@@ -13,8 +13,9 @@ var Gender;
     Gender["Other"] = "other";
 })(Gender = exports.Gender || (exports.Gender = {}));
 const patients = patients_json_1.default;
-// const isGender = (gender: unknown): gender is Gender => {
-// };
+const isGender = (gender) => {
+    return Object.values(Gender).includes(gender);
+};
 const getPatients = () => {
     return patients;
 };
@@ -43,7 +44,7 @@ const parseNewPatientData = (data) => {
         name: (name) => utils_1.isString(name),
         dateOfBirth: (dateOfBirth) => utils_1.isString(dateOfBirth) && utils_1.isDate(dateOfBirth),
         ssn: (ssn) => utils_1.isString(ssn),
-        gender: (gender) => utils_1.isString(gender),
+        gender: (gender) => utils_1.isString(gender) && isGender(gender),
         occupation: (occupation) => utils_1.isString(occupation),
     };
     Object.entries(validations).forEach(([key, test]) => {

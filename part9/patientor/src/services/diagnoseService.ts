@@ -1,13 +1,8 @@
-import diagnosesData from "../../data/diagnoses.json";
+import diagnosesData from "../data/diagnoses.json";
+import { Diagnosis } from "../types";
 
-export interface Diagnose {
-	code: string;
-	name: string;
-	latin?: string;
-}
+const diagnoses: Diagnosis[] = diagnosesData;
 
-const diagnoses: Diagnose[] = diagnosesData;
-
-export const getDiagnoses = (): Diagnose[] => {
+export const getDiagnoses = (): Diagnosis[] => {
 	return diagnoses;
 };
